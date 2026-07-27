@@ -1,18 +1,30 @@
-from flask import Blueprint, request, jsonify
+"""
+Workout Routes
+
+Contains CRUD endpoints for Workout.
+"""
+
+from flask import Blueprint, request
+
+from marshmallow import ValidationError
 
 from models import Workout
-from datetime import datetime
 from extensions import db
 
+from schemas.workout_schema import (
+    workout_schema,
+    workouts_schema
+)
 
-# Create Blueprint
-# Groups all workout-related routes
+
+# ==========================================
+# Blueprint
+# ==========================================
 
 workout_bp = Blueprint(
     "workout",
     __name__
 )
-
 
 
 # ==========================================
@@ -26,21 +38,7 @@ def get_workouts():
 
     workouts = Workout.query.all()
 
-
-    return jsonify(
-        [
-            {
-                "id": workout.id,
-                "date": workout.date,
-                "duration_minutes": workout.duration_minutes,
-                "notes": workout.notes
-            }
-
-            for workout in workouts
-        ]
-    )
-
-
+    return workouts_schema.dump(workouts), 200
 
 
 # ==========================================
@@ -54,25 +52,12 @@ def get_one_workout(id):
 
     workout = Workout.query.get(id)
 
-
-    if not workout:
-
+    if workout is None:
         return {
             "error": "Workout not found"
         }, 404
 
-
-
-    return {
-
-        "id": workout.id,
-        "date": workout.date,
-        "duration_minutes": workout.duration_minutes,
-        "notes": workout.notes
-
-    }
-
-
+    return workout_schema.dump(workout), 200
 
 
 # ==========================================
@@ -84,38 +69,22 @@ def get_one_workout(id):
 @workout_bp.route("/workouts", methods=["POST"])
 def create_workout():
 
-    data = request.get_json()
+    try:
+        data = workout_schema.load(
+            request.get_json()
+        )
 
+    except ValidationError as err:
+        return {
+            "errors": err.messages
+        }, 400
 
-    workout = Workout(
-
-    date=datetime.strptime(
-        data["date"],
-        "%Y-%m-%d"
-    ).date(),
-
-    duration_minutes=data["duration_minutes"],
-
-    notes=data.get("notes")
-
-)
-
+    workout = Workout(**data)
 
     db.session.add(workout)
-
     db.session.commit()
 
-
-
-    return {
-
-        "message": "Workout created",
-
-        "id": workout.id
-
-    }, 201
-
-
+    return workout_schema.dump(workout), 201
 
 
 # ==========================================
@@ -129,43 +98,28 @@ def update_workout(id):
 
     workout = Workout.query.get(id)
 
-
-    if not workout:
-
+    if workout is None:
         return {
             "error": "Workout not found"
         }, 404
 
+    try:
+        data = workout_schema.load(
+            request.get_json(),
+            partial=True
+        )
 
+    except ValidationError as err:
+        return {
+            "errors": err.messages
+        }, 400
 
-    data = request.get_json()
-
-
-
-    if "date" in data:
-        workout.date = data["date"]
-
-
-    if "duration_minutes" in data:
-        workout.duration_minutes = data["duration_minutes"]
-
-
-    if "notes" in data:
-        workout.notes = data["notes"]
-
-
+    for key, value in data.items():
+        setattr(workout, key, value)
 
     db.session.commit()
 
-
-
-    return {
-
-        "message": "Workout updated"
-
-    }
-
-
+    return workout_schema.dump(workout), 200
 
 
 # ==========================================
@@ -179,23 +133,14 @@ def delete_workout(id):
 
     workout = Workout.query.get(id)
 
-
-    if not workout:
-
+    if workout is None:
         return {
             "error": "Workout not found"
-        },404
-
-
+        }, 404
 
     db.session.delete(workout)
-
     db.session.commit()
 
-
-
     return {
-
-        "message": "Workout deleted"
-
-    }
+        "message": "Workout deleted successfully"
+    }, 200
