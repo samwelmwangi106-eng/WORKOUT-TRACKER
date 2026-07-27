@@ -89,13 +89,16 @@ def create_workout():
 
     workout = Workout(
 
-        date=data["date"],
+    date=datetime.strptime(
+        data["date"],
+        "%Y-%m-%d"
+    ).date(),
 
-        duration_minutes=data["duration_minutes"],
+    duration_minutes=data["duration_minutes"],
 
-        notes=data.get("notes")
+    notes=data.get("notes")
 
-    )
+)
 
 
     db.session.add(workout)

@@ -9,6 +9,7 @@ Responsibilities:
 3. Initialize extensions.
 4. Register routes.
 """
+import os
 
 from flask import Flask
 
@@ -24,7 +25,11 @@ app = Flask(__name__)
 
 # Database configuration
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+DATABASE_PATH = os.path.join(BASE_DIR, "instance", "app.db")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DATABASE_PATH}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -35,12 +40,16 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 migrate.init_app(app, db)
+with app.app_context():
+    print("Instance path:", app.instance_path)
+    print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
+    print("Engine URL:", db.engine.url)
 
 
 
 # # Import models after db initialization
 
-# from models import Workout, Exercise, WorkoutExercise
+from models import Workout, Exercise, WorkoutExercise
 
 
 
