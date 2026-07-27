@@ -1,42 +1,39 @@
 """
 models.py
 
-This file contains:
-
-1. The SQLAlchemy database instance.
-2. Workout model.
-3. Exercise model.
-4. WorkoutExercise model.
-5. Relationships between the models.
-6. Table constraints.
-7. Model validations.
+Contains:
+1. Workout model
+2. Exercise model
+3. WorkoutExercise join model
+4. Relationships
+5. Constraints
+6. Model validations
 """
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy import CheckConstraint
 
-# Create the SQLAlchemy database object.
-# It will be initialized inside app.py.
-db = SQLAlchemy()
+from extensions import db
 
 
 
+# ==========================================
 # Workout Model
+# ==========================================
 
 class Workout(db.Model):
     """
     Represents a workout session.
-    Example:
-        - Push Day
-        - Leg Day
-        - Full Body
+
+    Examples:
+    - Push Day
+    - Leg Day
+    - Full Body
     """
 
     __tablename__ = "workouts"
 
-    # Table constraint:
-    # Every workout must have a duration greater than zero.
+
     __table_args__ = (
         CheckConstraint(
             "duration_minutes > 0",
@@ -44,46 +41,51 @@ class Workout(db.Model):
         ),
     )
 
-    
-    id = db.Column(db.Integer, primary_key=True)
 
-   
-    date = db.Column(db.Date, nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    
+
+    date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+
     duration_minutes = db.Column(
         db.Integer,
         nullable=False
     )
 
-    # Optional notes
-    notes = db.Column(db.Text)
 
-    
-    # Relationships
-    
+    notes = db.Column(
+        db.Text
+    )
 
-    # One Workout has many WorkoutExercise records.
+
+    # One workout has many WorkoutExercise records
     workout_exercises = db.relationship(
         "WorkoutExercise",
         back_populates="workout",
         cascade="all, delete-orphan"
     )
 
-    # A Workout has many Exercises through WorkoutExercise.
+
+    # Many-to-many relationship with Exercise
     exercises = db.relationship(
         "Exercise",
         secondary="workout_exercises",
         viewonly=True
     )
 
-    # Model Validation
-    
+
+
+    # Validation
     @validates("duration_minutes")
     def validate_duration(self, key, value):
-        """
-        Ensure workout duration is greater than zero.
-        """
+
         if value <= 0:
             raise ValueError(
                 "Workout duration must be greater than 0 minutes."
@@ -92,131 +94,177 @@ class Workout(db.Model):
         return value
 
 
+
+
+# ==========================================
 # Exercise Model
+# ==========================================
+
 class Exercise(db.Model):
     """
     Represents a reusable exercise.
 
     Examples:
-        - Push-up
-        - Squat
-        - Deadlift
+    - Push-up
+    - Squat
+    - Deadlift
     """
 
     __tablename__ = "exercises"
 
-   
-    id = db.Column(db.Integer, primary_key=True)
 
-   
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+
     name = db.Column(
         db.String(100),
         nullable=False,
         unique=True
     )
 
-    
+
     category = db.Column(
         db.String(50),
         nullable=False
     )
 
-    # Whether equipment is required
+
     equipment_needed = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
 
-    # Relationships
-    
 
-    # One Exercise has many WorkoutExercise records.
+
+    # One exercise has many WorkoutExercise records
     workout_exercises = db.relationship(
         "WorkoutExercise",
         back_populates="exercise",
         cascade="all, delete-orphan"
     )
 
-    # An Exercise belongs to many Workouts.
+
+    # Many-to-many relationship with Workout
     workouts = db.relationship(
         "Workout",
         secondary="workout_exercises",
         viewonly=True
     )
 
-   
-    # Model Validation
-    
+
+
+    # Validation
     @validates("name")
     def validate_name(self, key, value):
-        """
-        Ensure the exercise name is valid.
-        """
-        if not value.strip():
+
+        value = value.strip()
+
+
+        if not value:
             raise ValueError(
                 "Exercise name cannot be empty."
             )
 
-        if len(value.strip()) < 3:
+
+        if len(value) < 3:
             raise ValueError(
-                "Exercise name must be at least 3 characters long."
+                "Exercise name must be at least 3 characters."
             )
+
 
         return value.title()
 
 
 
-# WorkoutExercise Model (Join Table)
+
+# ==========================================
+# WorkoutExercise Join Model
+# ==========================================
 
 class WorkoutExercise(db.Model):
     """
-    Join table connecting Workouts and Exercises.
+    Join table between Workout and Exercise.
 
-    Stores workout-specific information such as:
-        - reps
-        - sets
-        - duration_seconds
+    Stores workout-specific information:
+    - sets
+    - reps
+    - duration
     """
 
     __tablename__ = "workout_exercises"
 
-    # Primary Key
-    id = db.Column(db.Integer, primary_key=True)
 
-    # Foreign Key → Workout table
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+
+
     workout_id = db.Column(
         db.Integer,
         db.ForeignKey("workouts.id"),
         nullable=False
     )
 
-    # Foreign Key → Exercise table
+
+
     exercise_id = db.Column(
         db.Integer,
         db.ForeignKey("exercises.id"),
         nullable=False
     )
 
-    # Workout details
-    reps = db.Column(db.Integer)
 
-    sets = db.Column(db.Integer)
 
-    duration_seconds = db.Column(db.Integer)
+    reps = db.Column(
+        db.Integer
+    )
 
-    
-    # Relationships
-   
 
-    # Each WorkoutExercise belongs to one Workout.
+    sets = db.Column(
+        db.Integer
+    )
+
+
+    duration_seconds = db.Column(
+        db.Integer
+    )
+
+
+
+    # Relationship back to Workout
     workout = db.relationship(
         "Workout",
         back_populates="workout_exercises"
     )
 
-    # Each WorkoutExercise belongs to one Exercise.
+
+    # Relationship back to Exercise
     exercise = db.relationship(
         "Exercise",
         back_populates="workout_exercises"
     )
+
+
+
+    # Validation
+    @validates(
+        "reps",
+        "sets",
+        "duration_seconds"
+    )
+    def validate_positive_values(self, key, value):
+
+        if value is not None and value <= 0:
+            raise ValueError(
+                f"{key} must be greater than zero."
+            )
+
+        return value
