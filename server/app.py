@@ -13,7 +13,7 @@ import os
 
 from flask import Flask
 
-from extensions import db, migrate
+from extensions import db, migrate, ma
 
 
 
@@ -40,6 +40,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 migrate.init_app(app, db)
+ma.init_app(app)
 with app.app_context():
     print("Instance path:", app.instance_path)
     print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
