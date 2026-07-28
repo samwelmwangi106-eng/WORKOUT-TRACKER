@@ -17,9 +17,9 @@ from schemas.workout_schema import (
 )
 
 
-# ==========================================
+
 # Blueprint
-# ==========================================
+
 
 workout_bp = Blueprint(
     "workout",
@@ -27,11 +27,11 @@ workout_bp = Blueprint(
 )
 
 
-# ==========================================
+
 # GET ALL WORKOUTS
 # METHOD: GET
 # URL: /workouts
-# ==========================================
+
 
 @workout_bp.route("/workouts", methods=["GET"])
 def get_workouts():
@@ -41,11 +41,11 @@ def get_workouts():
     return workouts_schema.dump(workouts), 200
 
 
-# ==========================================
+
 # GET ONE WORKOUT
 # METHOD: GET
 # URL: /workouts/<id>
-# ==========================================
+
 
 @workout_bp.route("/workouts/<int:id>", methods=["GET"])
 def get_one_workout(id):
@@ -60,11 +60,11 @@ def get_one_workout(id):
     return workout_schema.dump(workout), 200
 
 
-# ==========================================
+
 # CREATE WORKOUT
 # METHOD: POST
 # URL: /workouts
-# ==========================================
+
 
 @workout_bp.route("/workouts", methods=["POST"])
 def create_workout():
@@ -87,11 +87,11 @@ def create_workout():
     return workout_schema.dump(workout), 201
 
 
-# ==========================================
+
 # UPDATE WORKOUT
 # METHOD: PATCH
 # URL: /workouts/<id>
-# ==========================================
+
 
 @workout_bp.route("/workouts/<int:id>", methods=["PATCH"])
 def update_workout(id):
@@ -122,11 +122,11 @@ def update_workout(id):
     return workout_schema.dump(workout), 200
 
 
-# ==========================================
+
 # DELETE WORKOUT
 # METHOD: DELETE
 # URL: /workouts/<id>
-# ==========================================
+
 
 @workout_bp.route("/workouts/<int:id>", methods=["DELETE"])
 def delete_workout(id):

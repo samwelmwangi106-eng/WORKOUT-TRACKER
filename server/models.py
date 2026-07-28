@@ -17,9 +17,9 @@ from extensions import db
 
 
 
-# ==========================================
+
 # Workout Model
-# ==========================================
+
 
 class Workout(db.Model):
     """
@@ -96,9 +96,9 @@ class Workout(db.Model):
 
 
 
-# ==========================================
+
 # Exercise Model
-# ==========================================
+
 
 class Exercise(db.Model):
     """
@@ -182,9 +182,9 @@ class Exercise(db.Model):
 
 
 
-# ==========================================
+
 # WorkoutExercise Join Model
-# ==========================================
+
 
 class WorkoutExercise(db.Model):
     """

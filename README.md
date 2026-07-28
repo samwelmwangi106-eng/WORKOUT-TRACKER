@@ -121,7 +121,7 @@ flask db upgrade
 Seed the database
 
 ```bash
-python server/seed.py
+python3 server/seed.py
 ```
 
 ---

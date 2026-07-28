@@ -26,9 +26,9 @@ class WorkoutSchema(SQLAlchemyAutoSchema):
         sqla_session = db.session
 
 
-    # ----------------------------
+   
     # Fields
-    # ----------------------------
+    
 
     id = fields.Integer(dump_only=True)
 
