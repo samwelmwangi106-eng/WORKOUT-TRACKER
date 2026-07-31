@@ -5,21 +5,18 @@ Contains CRUD endpoints for Workout.
 """
 
 from flask import Blueprint, request
-
 from marshmallow import ValidationError
 
-from models import Workout
-from extensions import db
+from server.models import Workout
+from server.extensions import db
 
-from schemas.workout_schema import (
+from server.schemas.workout_schema import (
     workout_schema,
     workouts_schema
 )
 
 
-
 # Blueprint
-
 
 workout_bp = Blueprint(
     "workout",
@@ -70,7 +67,7 @@ def get_one_workout(id):
 def create_workout():
 
     try:
-        data = workout_schema.load(
+        workout = workout_schema.load(
             request.get_json()
         )
 
@@ -78,8 +75,6 @@ def create_workout():
         return {
             "errors": err.messages
         }, 400
-
-    workout = Workout(**data)
 
     db.session.add(workout)
     db.session.commit()
@@ -104,8 +99,9 @@ def update_workout(id):
         }, 404
 
     try:
-        data = workout_schema.load(
+        workout = workout_schema.load(
             request.get_json(),
+            instance=workout,
             partial=True
         )
 
@@ -113,9 +109,6 @@ def update_workout(id):
         return {
             "errors": err.messages
         }, 400
-
-    for key, value in data.items():
-        setattr(workout, key, value)
 
     db.session.commit()
 
@@ -125,8 +118,7 @@ def update_workout(id):
 
 # DELETE WORKOUT
 # METHOD: DELETE
-# URL: /workouts/<id>
-
+# URL: /workouts/<int:id>
 
 @workout_bp.route("/workouts/<int:id>", methods=["DELETE"])
 def delete_workout(id):

@@ -13,8 +13,7 @@ import os
 
 from flask import Flask
 
-from extensions import db, migrate, ma
-
+from server.extensions import db, migrate, ma
 
 
 # Create Flask application
@@ -50,13 +49,13 @@ with app.app_context():
 
 # # Import models after db initialization
 
-from models import Workout, Exercise, WorkoutExercise
+from server.models import Workout, Exercise, WorkoutExercise
 
 
 
 # Import routes
 
-from routes.workout import workout_bp
+from server.routes.workout import workout_bp
 
 
 

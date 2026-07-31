@@ -13,7 +13,7 @@ Contains:
 from sqlalchemy.orm import validates
 from sqlalchemy import CheckConstraint
 
-from extensions import db
+from server.extensions import db
 
 
 

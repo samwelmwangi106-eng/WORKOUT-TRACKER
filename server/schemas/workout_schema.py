@@ -9,10 +9,10 @@ Contains the schema used to:
 """
 
 from marshmallow import fields, validate
-from flask_marshmallow import SQLAlchemyAutoSchema
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
-from models import Workout
-from extensions import db
+from server.models import Workout
+from server.extensions import db
 
 
 class WorkoutSchema(SQLAlchemyAutoSchema):
@@ -25,10 +25,7 @@ class WorkoutSchema(SQLAlchemyAutoSchema):
         load_instance = True
         sqla_session = db.session
 
-
-   
     # Fields
-    
 
     id = fields.Integer(dump_only=True)
 
@@ -45,3 +42,8 @@ class WorkoutSchema(SQLAlchemyAutoSchema):
     notes = fields.String(
         allow_none=True
     )
+
+
+# Schema instances
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)

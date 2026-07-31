@@ -12,8 +12,9 @@ the seed operation is skipped to avoid duplicates.
 
 from datetime import date
 
-from app import app, db
-from models import Workout, Exercise, WorkoutExercise
+from server.app import app, db
+from server.models import Workout, Exercise, WorkoutExercise
+
 
 
 def seed():
