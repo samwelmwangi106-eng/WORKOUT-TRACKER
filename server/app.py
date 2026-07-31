@@ -10,7 +10,9 @@ Responsibilities:
 4. Register routes.
 """
 import os
+instance_path = os.path.join(os.path.dirname(__file__), "instance")
 
+os.makedirs(instance_path, exist_ok=True)
 from flask import Flask
 
 from server.extensions import db, migrate, ma
