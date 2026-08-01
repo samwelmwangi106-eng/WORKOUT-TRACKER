@@ -1,27 +1,30 @@
-# WORKOUT-TRACKER
+#  Workout Tracker API
 
-A Flask REST API for tracking workouts and their associated exercises. The application allows users to create, update, retrieve, and delete workout sessions while maintaining relationships between workouts and exercises.
+A RESTful API built with **Flask**, **SQLAlchemy**, and **Marshmallow** for managing workout sessions and exercises.
+
+The application allows users to create workouts, manage reusable exercises, and associate exercises with workouts through a many-to-many relationship.
 
 ---
 
 ## Features
 
-- Create workouts
-- Retrieve all workouts
-- Retrieve a single workout
-- Update workout details
-- Delete workouts
-- Many-to-many relationship between workouts and exercises
-- Data validation using Marshmallow
-- SQLAlchemy ORM models
-- Database migrations using Flask-Migrate
-- SQLite database
+-  Full CRUD operations for Workouts
+-  Full CRUD operations for Exercises
+-  Full CRUD operations for WorkoutExercise records
+-  Many-to-many relationship between Workouts and Exercises
+-  SQLAlchemy ORM models
+-  Marshmallow serialization & deserialization
+-  Schema validations
+-  Model validations
+-  Database constraints
+-  Flask-Migrate database migrations
+-  Seed script with sample data
 
 ---
 
 ## Technologies Used
 
-- Python
+- Python 3
 - Flask
 - Flask-SQLAlchemy
 - Flask-Migrate
@@ -33,7 +36,7 @@ A Flask REST API for tracking workouts and their associated exercises. The appli
 
 ## Project Structure
 
-```
+```text
 WORKOUT-TRACKER/
 │
 ├── migrations/
@@ -45,23 +48,26 @@ WORKOUT-TRACKER/
 │   ├── seed.py
 │   │
 │   ├── routes/
-│   │   └── workout.py
+│   │   ├── workout.py
+│   │   ├── excercise.py
+│   │   └── workout_exercise.py
 │   │
 │   ├── schemas/
 │   │   ├── workout_schema.py
-│   │   ├── exercise_schema.py
+│   │   ├── excercise_schema.py
 │   │   └── workout_exercise_schema.py
 │   │
 │   └── instance/
 │       └── app.db
 │
+├── migrations/
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Installation
+# Installation
 
 Clone the repository
 
@@ -69,7 +75,7 @@ Clone the repository
 git clone <repository-url>
 ```
 
-Move into the project
+Navigate into the project
 
 ```bash
 cd WORKOUT-TRACKER
@@ -83,25 +89,25 @@ python -m venv venv
 
 Activate the virtual environment
 
-### Windows (Git Bash)
+### Git Bash
 
 ```bash
 source venv/Scripts/activate
 ```
 
-### Windows (Command Prompt)
+### Windows CMD
 
 ```cmd
 venv\Scripts\activate
 ```
 
-### macOS/Linux
+### macOS / Linux
 
 ```bash
 source venv/bin/activate
 ```
 
-Install the required packages
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -109,17 +115,15 @@ pip install -r requirements.txt
 
 ---
 
-## Database Setup
+# Database Setup
 
-The SQLite database (`app.db`) is **not included** in this repository.
-
-After cloning the project, create the database by running:
+Run the database migrations
 
 ```bash
 python -m flask --app server.app db upgrade
 ```
 
-Populate the database with sample data:
+Populate the database with sample data
 
 ```bash
 python -m server.seed
@@ -127,15 +131,15 @@ python -m server.seed
 
 ---
 
-## Running the Application
+# Running the Application
 
-Start the Flask development server:
+Start the development server
 
 ```bash
 python -m server.app
 ```
 
-The API will be available at:
+The API will be available at
 
 ```
 http://127.0.0.1:5555
@@ -143,68 +147,115 @@ http://127.0.0.1:5555
 
 ---
 
-## API Endpoints
+# API Endpoints
 
-### Workouts
+## Workout Endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/workouts` | Retrieve all workouts |
-| GET | `/workouts/<id>` | Retrieve a single workout |
-| POST | `/workouts` | Create a workout |
-| PATCH | `/workouts/<id>` | Update a workout |
-| DELETE | `/workouts/<id>` | Delete a workout |
+|---------|----------|-------------|
+| GET | `/workouts` | Get all workouts |
+| GET | `/workouts/<id>` | Get one workout |
+| POST | `/workouts` | Create workout |
+| PATCH | `/workouts/<id>` | Update workout |
+| DELETE | `/workouts/<id>` | Delete workout |
 
 ---
 
-## Example Request
+## Exercise Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/exercises` | Get all exercises |
+| GET | `/exercises/<id>` | Get one exercise |
+| POST | `/exercises` | Create exercise |
+| PATCH | `/exercises/<id>` | Update exercise |
+| DELETE | `/exercises/<id>` | Delete exercise |
+
+---
+
+## WorkoutExercise Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/workout-exercises` | Get all workout exercises |
+| GET | `/workout-exercises/<id>` | Get one workout exercise |
+| POST | `/workout-exercises` | Create workout exercise |
+| PATCH | `/workout-exercises/<id>` | Update workout exercise |
+| DELETE | `/workout-exercises/<id>` | Delete workout exercise |
+
+---
+
+# Example Request
 
 ### POST `/workouts`
 
 ```json
 {
-    "date": "2026-07-27",
-    "duration_minutes": 60,
-    "notes": "Leg day"
+  "date": "2026-07-27",
+  "duration_minutes": 60,
+  "notes": "Leg Day"
 }
 ```
 
 ---
 
-## Example Response
+# Example Response
 
 ```json
 {
-    "id": 1,
-    "date": "2026-07-27",
-    "duration_minutes": 60,
-    "notes": "Leg day"
+  "id": 1,
+  "date": "2026-07-27",
+  "duration_minutes": 60,
+  "notes": "Leg Day"
 }
 ```
 
 ---
 
-## Data Validation
+# Validations
 
-The API validates incoming data using Marshmallow and SQLAlchemy.
-
-Examples include:
+### Schema Validations
 
 - Workout duration must be greater than 0.
-- Exercise names must contain at least 3 characters.
-- Required fields cannot be empty.
-- Foreign key relationships are enforced by the database.
+- Exercise name must contain at least 3 characters.
+- Exercise category cannot be empty.
+- Sets, reps and duration must be greater than 0.
+
+### Model Validations
+
+- Workout duration cannot be zero or negative.
+- Exercise names are trimmed and formatted.
+- Positive values are enforced for reps, sets and duration.
+
+### Database Constraints
+
+- Workout duration must be positive.
+- Exercise names are unique.
+- Foreign key constraints maintain relationships.
 
 ---
 
-## Notes
+# Seed Data
 
-- The SQLite database (`app.db`) is generated locally and is not tracked by Git.
-- If you clone this repository, run the database migration before starting the server.
-- Sample data can be added using the seed script.
+Run
+
+```bash
+python -m server.seed
+```
+
+The script creates
+
+- 2 Workouts
+- 3 Exercises
+- 3 WorkoutExercise records
+
+The seed file is safe to run multiple times and avoids inserting duplicate data.
 
 ---
 
-## Author
+# Author
 
 **Samwel Macharia**
+
+---
+
