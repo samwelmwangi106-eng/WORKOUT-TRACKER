@@ -58,12 +58,15 @@ from server.models import Workout, Exercise, WorkoutExercise
 # Import routes
 
 from server.routes.workout import workout_bp
-
+from server.routes.excercise import exercise_bp
+from server.routes.workout_exercise import workout_exercise_bp
 
 
 # Register routes
 
 app.register_blueprint(workout_bp)
+app.register_blueprint(exercise_bp)
+app.register_blueprint(workout_exercise_bp)
 
 
 
